@@ -4,7 +4,7 @@ import ora from "ora";
 import { loadRepo, cleanupTemp } from "./repo/loader.js";
 import { walkFiles } from "./repo/file-walker.js";
 import { scanFiles } from "./scanner/static.js";
-import { analyzeWithAI } from "./scanner/ai.js";
+import { analyzeWithAI, getProviderHint } from "./scanner/ai.js";
 import { renderReport } from "./report/renderer.js";
 
 const program = new Command();
@@ -20,7 +20,7 @@ program
   .command("scan")
   .description("Scan a GitHub repository or local directory for suspicious code")
   .argument("<target>", "GitHub repository URL or local directory path")
-  .option("--ai", "Enable AI-powered deep analysis (requires OPENAI_API_KEY)")
+  .option("--ai", "Enable AI-powered deep analysis (requires GITHUB_TOKEN or OPENAI_API_KEY)")
   .option("--json", "Output results as JSON")
   .action(async (target: string, opts: { ai?: boolean; json?: boolean }) => {
     console.log(
@@ -62,20 +62,22 @@ program
 
       // AI analysis (optional)
       if (opts.ai) {
-        const apiKey = process.env.OPENAI_API_KEY;
-        if (!apiKey) {
+        const provider = getProviderHint();
+        if (provider === "none") {
           ora().warn(
             chalk.yellow(
-              "OPENAI_API_KEY not set. Skipping AI analysis. Set it with: export OPENAI_API_KEY=your-key"
+              "No AI provider configured. Set GITHUB_TOKEN (recommended) or OPENAI_API_KEY.\n" +
+                "  → GitHub Models: export GITHUB_TOKEN=your-github-token\n" +
+                "  → OpenAI:        export OPENAI_API_KEY=your-openai-key"
             )
           );
         } else if (report.findings.length === 0) {
           ora().info("No findings to analyze with AI.");
         } else {
-          const aiSpinner = ora("Running AI-powered deep analysis...").start();
+          const aiSpinner = ora(`Running AI-powered deep analysis via ${provider}...`).start();
           try {
-            report.aiAnalysis = await analyzeWithAI(report.findings, apiKey);
-            aiSpinner.succeed("AI analysis complete");
+            report.aiAnalysis = await analyzeWithAI(report.findings);
+            aiSpinner.succeed(`AI analysis complete (${provider})`);
           } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : String(err);
             aiSpinner.fail(`AI analysis failed: ${msg}`);

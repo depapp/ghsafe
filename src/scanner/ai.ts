@@ -1,11 +1,47 @@
 import OpenAI from "openai";
 import { Finding } from "../report/types.js";
 
-export async function analyzeWithAI(
-  findings: Finding[],
-  apiKey: string
-): Promise<string> {
-  const openai = new OpenAI({ apiKey });
+interface AIProvider {
+  name: string;
+  client: OpenAI;
+  model: string;
+}
+
+function getAIProvider(): AIProvider {
+  // Primary: GitHub Models (uses GITHUB_TOKEN)
+  if (process.env.GITHUB_TOKEN) {
+    return {
+      name: "GitHub Models",
+      client: new OpenAI({
+        baseURL: "https://models.inference.ai.azure.com",
+        apiKey: process.env.GITHUB_TOKEN,
+      }),
+      model: "gpt-4o-mini",
+    };
+  }
+
+  // Fallback: OpenAI directly
+  if (process.env.OPENAI_API_KEY) {
+    return {
+      name: "OpenAI",
+      client: new OpenAI({ apiKey: process.env.OPENAI_API_KEY }),
+      model: "gpt-4o-mini",
+    };
+  }
+
+  throw new Error(
+    "No AI provider configured. Set GITHUB_TOKEN (recommended) or OPENAI_API_KEY."
+  );
+}
+
+export function getProviderHint(): string {
+  if (process.env.GITHUB_TOKEN) return "GitHub Models (GITHUB_TOKEN)";
+  if (process.env.OPENAI_API_KEY) return "OpenAI (OPENAI_API_KEY)";
+  return "none";
+}
+
+export async function analyzeWithAI(findings: Finding[]): Promise<string> {
+  const provider = getAIProvider();
 
   const findingSummary = findings
     .slice(0, 20) // limit to top 20 findings
@@ -15,8 +51,8 @@ export async function analyzeWithAI(
     )
     .join("\n\n");
 
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+  const response = await provider.client.chat.completions.create({
+    model: provider.model,
     messages: [
       {
         role: "system",

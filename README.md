@@ -21,14 +21,11 @@ Not everyone is that careful. **ghsafe** is a CLI tool that scans any GitHub rep
 ## 📦 Installation
 
 ```bash
-# Clone and build
-git clone https://github.com/YOUR_USERNAME/ghsafe.git
-cd ghsafe
-npm install
-npm run build
+# Run directly with npx (no install needed)
+npx ghsafe scan https://github.com/user/suspicious-repo
 
-# Link globally (optional)
-npm link
+# Or install globally
+npm install -g ghsafe
 ```
 
 ## 🚀 Usage
@@ -36,26 +33,31 @@ npm link
 ### Scan a GitHub Repository
 
 ```bash
-ghsafe scan https://github.com/user/suspicious-repo
+npx ghsafe scan https://github.com/user/suspicious-repo
 ```
 
 ### Scan a Local Directory
 
 ```bash
-ghsafe scan ./path/to/project
+npx ghsafe scan ./path/to/project
 ```
 
 ### Enable AI-Powered Analysis
 
 ```bash
-export OPENAI_API_KEY=your-key
-ghsafe scan https://github.com/user/repo --ai
+# Recommended: Use GitHub Models (via your GitHub token)
+export GITHUB_TOKEN=your-github-token
+npx ghsafe scan https://github.com/user/repo --ai
+
+# Alternative: Use OpenAI directly
+export OPENAI_API_KEY=your-openai-key
+npx ghsafe scan https://github.com/user/repo --ai
 ```
 
 ### JSON Output (for CI/CD)
 
 ```bash
-ghsafe scan ./project --json
+npx ghsafe scan ./project --json
 ```
 
 ## 🔍 What It Detects
@@ -107,13 +109,33 @@ ghsafe produces a rich terminal report with:
 
 ## 🤖 AI-Powered Analysis
 
-When you enable the `--ai` flag, ghsafe sends a summary of the findings to OpenAI's GPT-4o-mini for deeper contextual analysis. This helps:
+When you enable the `--ai` flag, ghsafe sends a summary of the findings to an AI model for deeper contextual analysis.
+
+### GitHub Models (Recommended)
+
+ghsafe integrates natively with **GitHub Models** — using your existing `GITHUB_TOKEN` to access AI models through GitHub's infrastructure. No additional API keys needed if you already have a GitHub token.
+
+```bash
+export GITHUB_TOKEN=your-github-token
+npx ghsafe scan https://github.com/user/repo --ai
+```
+
+### OpenAI (Fallback)
+
+If `GITHUB_TOKEN` is not set, ghsafe falls back to OpenAI directly.
+
+```bash
+export OPENAI_API_KEY=your-openai-key
+npx ghsafe scan https://github.com/user/repo --ai
+```
+
+AI analysis helps:
 
 - Distinguish false positives from real threats
 - Understand the intent behind suspicious patterns
 - Get actionable recommendations
 
-**Note:** AI analysis is optional and requires an `OPENAI_API_KEY`. The basic static scan works without any API keys.
+**Note:** AI analysis is optional. The basic static scan works without any API keys or tokens.
 
 ## 🏗️ Architecture
 

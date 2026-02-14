@@ -20,8 +20,24 @@
     "github",
     "cli"
   ],
-  "author": "",
+  "author": "depapp",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/depapp/ghsafe.git"
+  },
+  "homepage": "https://github.com/depapp/ghsafe",
+  "bugs": {
+    "url": "https://github.com/depapp/ghsafe/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "dependencies": {
     "chalk": "^5.4.1",
     "cli-table3": "^0.6.5",
