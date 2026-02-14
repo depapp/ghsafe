@@ -1,6 +1,6 @@
 {
   "name": "ghsafe",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "GitHub Repository Security Analyzer — Scan repos for phishing, malware, and suspicious code before you run them",
   "main": "dist/index.js",
   "bin": {
