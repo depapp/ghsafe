@@ -8,11 +8,11 @@
 
 ## 🎯 Why ghsafe?
 
-A developer friend received a job offer on LinkedIn from someone pretending to be an HR from a well-known tech company. The "interview process" required cloning and running a GitHub repository — a seemingly normal coding exercise. Luckily, my friend reviewed the code first and found **hidden data exfiltration, environment variable theft, and obfuscated payloads** buried inside.
+A developer friend received a job opportunity on LinkedIn from someone pretending to be from a well-known tech company. They asked him to check out a GitHub repository — a seemingly normal coding exercise. Luckily, my friend reviewed the code first and found **hidden data exfiltration, environment variable theft, and obfuscated payloads** buried inside.
 
 Not everyone is that careful. **ghsafe** is a CLI tool that scans any GitHub repository for malicious patterns **before you run it**, helping protect developers from:
 
-- 🎣 **Phishing repos** disguised as job interviews or coding tests
+- 🎣 **Phishing repos** disguised as job opportunities or coding tests
 - 💀 **Malware** hidden in postinstall scripts
 - 🔑 **Credential theft** targeting SSH keys, API tokens, and browser data
 - ⛏️ **Crypto miners** embedded in seemingly normal projects
